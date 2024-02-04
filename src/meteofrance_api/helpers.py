@@ -175,3 +175,19 @@ def timestamp_to_dateime_with_locale_tz(timestamp: int, local_tz: str) -> dateti
     dt_utc = utc.localize(datetime.utcfromtimestamp(timestamp))
     # convert datetime to local timezone
     return dt_utc.astimezone(timezone(local_tz))
+
+def time_to_datetime_with_locale_tz(time: str, local_tz: str) -> datetime:
+    """Convert time in datetime (Helper).
+
+    Args:
+        time: Time ("2024-02-04T14:10:00.000Z")
+        local_tz: Name of the timezone to be used to convert the timestamp.
+
+    Returns:
+        Datetime instance corresponding to the timestamp with a timezone.
+    """
+    # convert timestamp in datetime with UTC timezone
+    format = "%Y-%m-%dT%H:%M:%S.%fZ"
+    dt_utc = utc.localize(datetime.strptime(time, format))
+    # convert datetime to local timezone
+    return dt_utc.astimezone(timezone(local_tz))

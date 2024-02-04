@@ -7,14 +7,13 @@ from typing import List
 from typing import Optional
 from typing import TypedDict
 
-from meteofrance_api.helpers import timestamp_to_dateime_with_locale_tz
-
+from meteofrance_api.helpers import time_to_datetime_with_locale_tz
 
 class RainData(TypedDict):
     """Describing the data structure of rain object returned by the REST API."""
 
-    position: Dict[str, Any]
-    updated_on: int
+    geometry: Dict[str, Any]
+    update_time: int
     forecast: List[Dict[str, Any]]
     quality: int
 
@@ -40,25 +39,24 @@ class Rain:
         self.raw_data = raw_data
 
     @property
-    def position(self) -> Dict[str, Any]:
-        """Return the position information of the rain forecast."""
-        return self.raw_data["position"]
+    def update_time(self) -> int:
+        """Return the update time of the rain forecast."""
+        return self.raw_data["update_time"]
 
     @property
-    def updated_on(self) -> int:
-        """Return the update timestamp of the rain forecast."""
-        return self.raw_data["updated_on"]
+    def geometry(self) -> Dict[str, Any]:
+        """Return the geometry information of the rain forecast."""
+        return self.raw_data["geometry"]
+
+    @property
+    def properties(self) -> List[Dict[str, Any]]:
+        """Return the rain properties."""
+        return self.raw_data["properties"]
 
     @property
     def forecast(self) -> List[Dict[str, Any]]:
         """Return the rain forecast."""
-        return self.raw_data["forecast"]
-
-    @property
-    def quality(self) -> int:
-        """Return the quality of the rain forecast."""
-        # TODO: don't know yet what is the usage
-        return self.raw_data["quality"]
+        return self.raw_data["properties"]["forecast"]
 
     def next_rain_date_locale(self) -> Optional[datetime]:
         """Estimate the date of the next rain in the Place timezone (Helper).
@@ -72,28 +70,28 @@ class Rain:
         """
         # search first cadran with rain
         next_rain = next(
-            (cadran for cadran in self.forecast if cadran["rain"] > 1), None
+            (cadran for cadran in self.forecast if cadran["rain_intensity"] > 1), None
         )
 
         next_rain_dt_local: Optional[datetime] = None
         if next_rain is not None:
-            # get the time stamp of the first cadran with rain
-            next_rain_timestamp = next_rain["dt"]
-            # convert timestamp in datetime with local timezone
-            next_rain_dt_local = timestamp_to_dateime_with_locale_tz(
-                next_rain_timestamp, self.position["timezone"]
+            # get the time of the first cadran with rain
+            next_rain_timestamp = next_rain["time"]
+            # convert time in datetime with local timezone
+            next_rain_dt_local = time_to_datetime_with_locale_tz(
+                next_rain_timestamp, self.properties["timezone"]
             )
 
         return next_rain_dt_local
 
-    def timestamp_to_locale_time(self, timestamp: int) -> datetime:
-        """Convert timestamp in datetime with rain forecast location timezone (Helper).
+    def time_to_locale_time(self, time: str) -> datetime:
+        """Convert time in datetime with rain forecast location timezone (Helper).
 
         Args:
-            timestamp: An integer representing the UNIX timestamp.
+            time: An String representing the UNIX timestamp.
 
         Returns:
             A datetime instance corresponding to the timestamp with the timezone of the
                 rain forecast location.
         """
-        return timestamp_to_dateime_with_locale_tz(timestamp, self.position["timezone"])
+        return time_to_datetime_with_locale_tz(time, self.properties["timezone"])
