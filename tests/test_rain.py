@@ -8,7 +8,6 @@ import requests
 from meteofrance_api import MeteoFranceClient
 from meteofrance_api.const import METEOFRANCE_API_URL
 
-
 def test_rain() -> None:
     """Test rain forecast on a covered zone."""
     client = MeteoFranceClient()
@@ -35,34 +34,38 @@ def test_rain_expected(requests_mock: Mock) -> None:
 
     requests_mock.request(
         "get",
-        f"{METEOFRANCE_API_URL}/rain",
+        f"{METEOFRANCE_API_URL}/v3/rain",
         json={
-            "position": {
-                "lat": 48.807166,
-                "lon": 2.239895,
-                "alti": 76,
-                "name": "Meudon",
-                "country": "FR - France",
-                "dept": "92",
-                "timezone": "Europe/Paris",
+            "update_time":"2024-02-04T13:55:00.000Z",
+            "type":"Feature",
+            "geometry":{
+                "type":"Point",
+                "coordinates":[2.239895,48.807166]
             },
-            "updated_on": 1589995200,
-            "quality": 0,
-            "forecast": [
-                {"dt": 1589996100, "rain": 1, "desc": "Temps sec"},
-                {"dt": 1589996400, "rain": 1, "desc": "Temps sec"},
-                {"dt": 1589996700, "rain": 1, "desc": "Temps sec"},
-                {"dt": 1589997000, "rain": 2, "desc": "Pluie faible"},
-                {"dt": 1589997300, "rain": 3, "desc": "Pluie modérée"},
-                {"dt": 1589997600, "rain": 2, "desc": "Pluie faible"},
-                {"dt": 1589998200, "rain": 1, "desc": "Temps sec"},
-                {"dt": 1589998800, "rain": 1, "desc": "Temps sec"},
-                {"dt": 1589999400, "rain": 1, "desc": "Temps sec"},
-            ],
+            "properties":{
+                "altitude":76,
+                "name":"Meudon",
+                "country":"FR - France",
+                "french_department":"92",
+                "rain_product_available":1,
+                "timezone":"Europe/Paris",
+                "forecast": [
+                    {"time":"2024-02-04T14:10:00.000Z","rain_intensity":1,"rain_intensity_description":"Temps sec"},
+                    {"time":"2024-02-04T14:15:00.000Z","rain_intensity":1,"rain_intensity_description":"Temps sec"},
+                    {"time":"2024-02-04T14:20:00.000Z","rain_intensity":1,"rain_intensity_description":"Temps sec"},
+                    {"time":"2024-02-04T14:25:00.000Z","rain_intensity":2,"rain_intensity_description":"Pluie faible"},
+                    {"time":"2024-02-04T14:30:00.000Z","rain_intensity":3,"rain_intensity_description":"Pluie modérée"},
+                    {"time":"2024-02-04T14:35:00.000Z","rain_intensity":2,"rain_intensity_description":"Pluie faible"},
+                    {"time":"2024-02-04T14:45:00.000Z","rain_intensity":1,"rain_intensity_description":"Temps sec"},
+                    {"time":"2024-02-04T14:55:00.000Z","rain_intensity":1,"rain_intensity_description":"Temps sec"},
+                    {"time":"2024-02-04T15:05:00.000Z","rain_intensity":1,"rain_intensity_description":"Temps sec"},
+                ],
+            }
         },
     )
 
     rain = client.get_rain(latitude=48.8075, longitude=2.24028)
+    print(rain)
     date_rain = rain.next_rain_date_locale()
     assert str(date_rain) == "2020-05-20 19:50:00+02:00"
     assert (
@@ -77,30 +80,33 @@ def test_no_rain_expected(requests_mock: Mock) -> None:
 
     requests_mock.request(
         "get",
-        f"{METEOFRANCE_API_URL}/rain",
+        f"{METEOFRANCE_API_URL}/v3/rain",
         json={
-            "position": {
-                "lat": 48.807166,
-                "lon": 2.239895,
-                "alti": 76,
-                "name": "Meudon",
-                "country": "FR - France",
-                "dept": "92",
-                "timezone": "Europe/Paris",
+            "update_time":"2024-02-04T13:55:00.000Z",
+            "type":"Feature",
+            "geometry":{
+                "type":"Point",
+                "coordinates":[2.239895,48.807166]
             },
-            "updated_on": 1589995200,
-            "quality": 0,
-            "forecast": [
-                {"dt": 1589996100, "rain": 1, "desc": "Temps sec"},
-                {"dt": 1589996400, "rain": 1, "desc": "Temps sec"},
-                {"dt": 1589996700, "rain": 1, "desc": "Temps sec"},
-                {"dt": 1589997000, "rain": 1, "desc": "Temps sec"},
-                {"dt": 1589997300, "rain": 1, "desc": "Temps sec"},
-                {"dt": 1589997600, "rain": 1, "desc": "Temps sec"},
-                {"dt": 1589998200, "rain": 1, "desc": "Temps sec"},
-                {"dt": 1589998800, "rain": 1, "desc": "Temps sec"},
-                {"dt": 1589999400, "rain": 1, "desc": "Temps sec"},
-            ],
+            "properties":{
+                "altitude":76,
+                "name":"Meudon",
+                "country":"FR - France",
+                "french_department":"92",
+                "rain_product_available":1,
+                "timezone":"Europe/Paris",
+                "forecast": [
+                    {"time":"2024-02-04T14:10:00.000Z","rain_intensity":1,"rain_intensity_description":"Temps sec"},
+                    {"time":"2024-02-04T14:15:00.000Z","rain_intensity":1,"rain_intensity_description":"Temps sec"},
+                    {"time":"2024-02-04T14:20:00.000Z","rain_intensity":1,"rain_intensity_description":"Temps sec"},
+                    {"time":"2024-02-04T14:25:00.000Z","rain_intensity":1,"rain_intensity_description":"Temps sec"},
+                    {"time":"2024-02-04T14:30:00.000Z","rain_intensity":1,"rain_intensity_description":"Temps sec"},
+                    {"time":"2024-02-04T14:35:00.000Z","rain_intensity":1,"rain_intensity_description":"Temps sec"},
+                    {"time":"2024-02-04T14:45:00.000Z","rain_intensity":1,"rain_intensity_description":"Temps sec"},
+                    {"time":"2024-02-04T14:55:00.000Z","rain_intensity":1,"rain_intensity_description":"Temps sec"},
+                    {"time":"2024-02-04T15:05:00.000Z","rain_intensity":1,"rain_intensity_description":"Temps sec"},
+                ],
+            }
         },
     )
 
